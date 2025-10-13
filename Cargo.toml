@@ -9,5 +9,8 @@ rand = "0.8"
 sha2 = "0.10.8"
 pkcs8 = { version = "0.10.2", features = ["pem"] }
 
+ring = { version = "0.17" }
+bytes = "1.10.1"
+
 [dev-dependencies]
 hex = "0.4.3"

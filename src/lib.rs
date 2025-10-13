@@ -3,6 +3,8 @@ use rsa::pkcs8::{DecodePrivateKey, DecodePublicKey, EncodePrivateKey, EncodePubl
 use rsa::{Oaep, RsaPrivateKey, RsaPublicKey};
 use sha2::Sha256;
 
+pub mod ring_aes_gcm_cipher;
+
 pub const BITS: usize = 2048;
 
 pub struct CertPem {
