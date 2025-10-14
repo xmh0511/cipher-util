@@ -1,4 +1,4 @@
-use rsa_cipher::{CipherUtil, gen_cert};
+use cipher_util::rsa::{CipherUtil, gen_cert};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let pem_buf = gen_cert()?;
