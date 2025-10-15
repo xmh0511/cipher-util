@@ -1,5 +1,5 @@
 use crate::ring_aes_gcm_cipher::AesGcmCipher;
-use bytes::BytesMut;
+use bytes::{Bytes, BytesMut};
 use futures::{SinkExt, StreamExt};
 use std::io;
 use tokio::net::tcp::{OwnedReadHalf, OwnedWriteHalf};
@@ -39,6 +39,12 @@ impl AesGcmFramed {
     }
     pub async fn send(&mut self, mut buf: BytesMut) -> io::Result<()> {
         buf.resize(buf.len() + self.aes_gcm.reserved_len(), 0);
+        self.aes_gcm.encrypt(&mut buf)?;
+        self.framed.send(buf.freeze()).await
+    }
+    pub async fn send_bytes(&mut self,  src: Bytes) -> io::Result<()> {
+        let mut buf = BytesMut::zeroed(src.len() + self.aes_gcm.reserved_len());
+        buf[..src.len()].copy_from_slice(&src);
         self.aes_gcm.encrypt(&mut buf)?;
         self.framed.send(buf.freeze()).await
     }
@@ -110,6 +116,12 @@ impl AesGcmWriteFramed {
 
     pub async fn send(&mut self, mut buf: BytesMut) -> io::Result<()> {
         buf.resize(buf.len() + self.aes_gcm.reserved_len(), 0);
+        self.aes_gcm.encrypt(&mut buf)?;
+        self.framed.send(buf.freeze()).await
+    }
+    pub async fn send_bytes(&mut self,  src: Bytes) -> io::Result<()> {
+        let mut buf = BytesMut::zeroed(src.len() + self.aes_gcm.reserved_len());
+        buf[..src.len()].copy_from_slice(&src);
         self.aes_gcm.encrypt(&mut buf)?;
         self.framed.send(buf.freeze()).await
     }
