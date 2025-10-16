@@ -59,3 +59,23 @@ impl CipherUtil {
         Ok(decrypted_data)
     }
 }
+
+pub struct RsaEncryptor {
+    pub_key: RsaPublicKey,
+}
+impl RsaEncryptor {
+    pub fn new(pub_key: Vec<u8>) -> Result<Self, std::io::Error> {
+        let pub_key = RsaPublicKey::from_public_key_pem(String::from_utf8_lossy(&pub_key).as_ref())
+            .map_err(|e| std::io::Error::other(e.to_string()))?;
+        Ok(Self { pub_key })
+    }
+    pub fn encrypt(&self, data: &[u8]) -> Result<Vec<u8>, std::io::Error> {
+        let padding = Oaep::new::<Sha256>();
+        let mut rng = OsRng;
+        let encrypted_data = self
+            .pub_key
+            .encrypt(&mut rng, padding, data)
+            .map_err(|e| std::io::Error::other(e.to_string()))?;
+        Ok(encrypted_data)
+    }
+}
