@@ -48,6 +48,12 @@ impl AesGcmFramed {
         self.aes_gcm.encrypt(&mut buf)?;
         self.framed.send(buf.freeze()).await
     }
+    pub async fn send_buf(&mut self, src: &[u8]) -> io::Result<()> {
+        let mut buf = BytesMut::zeroed(src.len() + self.aes_gcm.reserved_len());
+        buf[..src.len()].copy_from_slice(src);
+        self.aes_gcm.encrypt(&mut buf)?;
+        self.framed.send(buf.freeze()).await
+    }
     pub fn into_inner(self) -> Framed<TcpStream, LengthDelimitedCodec> {
         self.framed
     }
@@ -122,6 +128,12 @@ impl AesGcmWriteFramed {
     pub async fn send_bytes(&mut self, src: Bytes) -> io::Result<()> {
         let mut buf = BytesMut::zeroed(src.len() + self.aes_gcm.reserved_len());
         buf[..src.len()].copy_from_slice(&src);
+        self.aes_gcm.encrypt(&mut buf)?;
+        self.framed.send(buf.freeze()).await
+    }
+    pub async fn send_buf(&mut self, src: &[u8]) -> io::Result<()> {
+        let mut buf = BytesMut::zeroed(src.len() + self.aes_gcm.reserved_len());
+        buf[..src.len()].copy_from_slice(src);
         self.aes_gcm.encrypt(&mut buf)?;
         self.framed.send(buf.freeze()).await
     }
